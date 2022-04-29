@@ -1,0 +1,218 @@
+{
+    "00-01": {
+        "date": "29-04-2022",
+        "hour": "00-01",
+        "is-cheap": true,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 254.96,
+        "units": "€/Mwh"
+    },
+    "01-02": {
+        "date": "29-04-2022",
+        "hour": "01-02",
+        "is-cheap": true,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 255.29,
+        "units": "€/Mwh"
+    },
+    "02-03": {
+        "date": "29-04-2022",
+        "hour": "02-03",
+        "is-cheap": true,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 256.76,
+        "units": "€/Mwh"
+    },
+    "03-04": {
+        "date": "29-04-2022",
+        "hour": "03-04",
+        "is-cheap": true,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 258.82,
+        "units": "€/Mwh"
+    },
+    "04-05": {
+        "date": "29-04-2022",
+        "hour": "04-05",
+        "is-cheap": false,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 261.32,
+        "units": "€/Mwh"
+    },
+    "05-06": {
+        "date": "29-04-2022",
+        "hour": "05-06",
+        "is-cheap": false,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 270.57,
+        "units": "€/Mwh"
+    },
+    "06-07": {
+        "date": "29-04-2022",
+        "hour": "06-07",
+        "is-cheap": false,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 288.16,
+        "units": "€/Mwh"
+    },
+    "07-08": {
+        "date": "29-04-2022",
+        "hour": "07-08",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 303,
+        "units": "€/Mwh"
+    },
+    "08-09": {
+        "date": "29-04-2022",
+        "hour": "08-09",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 338.66,
+        "units": "€/Mwh"
+    },
+    "09-10": {
+        "date": "29-04-2022",
+        "hour": "09-10",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 311.31,
+        "units": "€/Mwh"
+    },
+    "10-11": {
+        "date": "29-04-2022",
+        "hour": "10-11",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 331.39,
+        "units": "€/Mwh"
+    },
+    "11-12": {
+        "date": "29-04-2022",
+        "hour": "11-12",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 319.53,
+        "units": "€/Mwh"
+    },
+    "12-13": {
+        "date": "29-04-2022",
+        "hour": "12-13",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 308.27,
+        "units": "€/Mwh"
+    },
+    "13-14": {
+        "date": "29-04-2022",
+        "hour": "13-14",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 303.14,
+        "units": "€/Mwh"
+    },
+    "14-15": {
+        "date": "29-04-2022",
+        "hour": "14-15",
+        "is-cheap": true,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 253.06,
+        "units": "€/Mwh"
+    },
+    "15-16": {
+        "date": "29-04-2022",
+        "hour": "15-16",
+        "is-cheap": true,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 256.81,
+        "units": "€/Mwh"
+    },
+    "16-17": {
+        "date": "29-04-2022",
+        "hour": "16-17",
+        "is-cheap": false,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 268.7,
+        "units": "€/Mwh"
+    },
+    "17-18": {
+        "date": "29-04-2022",
+        "hour": "17-18",
+        "is-cheap": false,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 277.93,
+        "units": "€/Mwh"
+    },
+    "18-19": {
+        "date": "29-04-2022",
+        "hour": "18-19",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 325.63,
+        "units": "€/Mwh"
+    },
+    "19-20": {
+        "date": "29-04-2022",
+        "hour": "19-20",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 343.44,
+        "units": "€/Mwh"
+    },
+    "20-21": {
+        "date": "29-04-2022",
+        "hour": "20-21",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 381.63,
+        "units": "€/Mwh"
+    },
+    "21-22": {
+        "date": "29-04-2022",
+        "hour": "21-22",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 381.38,
+        "units": "€/Mwh"
+    },
+    "22-23": {
+        "date": "29-04-2022",
+        "hour": "22-23",
+        "is-cheap": false,
+        "is-under-avg": false,
+        "market": "PVPC",
+        "price": 323.34,
+        "units": "€/Mwh"
+    },
+    "23-24": {
+        "date": "29-04-2022",
+        "hour": "23-24",
+        "is-cheap": false,
+        "is-under-avg": true,
+        "market": "PVPC",
+        "price": 298.42,
+        "units": "€/Mwh"
+    }
+}
