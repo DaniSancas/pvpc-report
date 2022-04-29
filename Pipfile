@@ -9,9 +9,11 @@ requests = "*"
 [dev-packages]
 pytest = "*"
 requests-mock = "*"
+deepdiff = "*"
+pytest-cov = "*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.8"
 
 [scripts]
 test = "pytest"
