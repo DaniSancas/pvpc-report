@@ -5,7 +5,7 @@ import requests
 
 class PVPCDay:
 
-    endpoint = 'https://api.preciodelaluz.org/v1/prices/all?zone=PCB'
+    endpoint = "https://api.preciodelaluz.org/v1/prices/all?zone=PCB"
     raw_data: dict
     clean_data: dict
 
@@ -26,7 +26,7 @@ class PVPCDay:
 
     def clean_pvpc_data(self, raw_data: dict) -> dict:
         cleaned_data = {}
-        
+
         for hour_key, hour_value in raw_data.items():
             cleaned_hour_key = hour_key[0:2]
             cleaned_hour_value = self.clean_hourly_data(hour_value)

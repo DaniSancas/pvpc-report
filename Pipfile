@@ -11,6 +11,7 @@ pytest = "*"
 requests-mock = "*"
 deepdiff = "*"
 pytest-cov = "*"
+black = "*"
 
 [requires]
 python_version = "3.8"

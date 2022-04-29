@@ -10,7 +10,7 @@ from pvpc.model import PVPCDay
 
 class TestModel:
 
-    DAILY_SAMPLE_PATH = 'tests/fixtures/daily_sample.json'
+    DAILY_SAMPLE_PATH = "tests/fixtures/daily_sample.json"
 
     @pytest.fixture
     def raw_data(self) -> dict:
@@ -29,7 +29,7 @@ class TestModel:
         with requests_mock.Mocker() as mock:
             mock.get(f"{PVPCDay.endpoint}", json=raw_data)
             data = PVPCDay().get_today_raw_pvpc_data()
-        
+
         assert len(data) == 24
         assert "price" in data["00-01"]
         assert data["00-01"]["price"] == 254.96
@@ -37,7 +37,7 @@ class TestModel:
     def test_get_today_raw_pvpc_data_error(self):
         with requests_mock.Mocker() as mock:
             with pytest.raises(HTTPError):
-                mock.get(PVPCDay.endpoint, text='Not Found', status_code=404)
+                mock.get(PVPCDay.endpoint, text="Not Found", status_code=404)
                 _ = PVPCDay().get_today_raw_pvpc_data()
 
     def test_clean_hourly_data(self, model_with_raw: PVPCDay):
@@ -50,12 +50,12 @@ class TestModel:
             "is-under-avg": True,
             "market": "PVPC",
             "price": 254.96,
-            "units": "€/Mwh"
+            "units": "€/Mwh",
         }
 
         output = model_with_raw.clean_hourly_data(hour_data=hour_to_test)
 
-        assert expected_output['hour'] == output['hour']
+        assert expected_output["hour"] == output["hour"]
         assert DeepDiff(expected_output, output) == {}
 
     def test_clean_pvpc_data(self, model_with_raw: PVPCDay):
@@ -71,7 +71,7 @@ class TestModel:
             mock.get(f"{PVPCDay.endpoint}", json=raw_data)
             pvpc = PVPCDay()
             pvpc.run()
-        
+
         assert len(pvpc.raw_data) == 24
         assert "price" in pvpc.raw_data["00-01"]
         assert pvpc.raw_data["00-01"]["price"] == 254.96
