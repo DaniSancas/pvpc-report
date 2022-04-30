@@ -1,26 +1,44 @@
+from typing import List, Tuple
 from pvpc.port import InputPort, OutputPort
 
 
 class PVPCDay:
 
+    number_of_2h_periods: int
     raw_data: dict
     prices_of_2h_periods: dict
+    sorted_prices_of_2h_periods: List[Tuple[str, float]]
     cheapest_6h: dict
-    best_n_prices: dict
-    worst_n_prices: dict
+    best_n_periods_of_2h: dict
 
     def __init__(
         self,
         input_repo: InputPort,
         output_repo: OutputPort,
+        number_of_2h_periods: int = 4,
     ) -> None:
         self.input_repo = input_repo
         self.output_repo = output_repo
+        self.number_of_2h_periods = number_of_2h_periods
 
     def run(self):
         self.raw_data = self.input_repo.get_raw_data()
-        self.prices_of_2h_periods = self.get_prices_of_2h_periods()
         self.cheapest_6h = self.get_6_cheapest_hours()
+        self.prices_of_2h_periods = self.get_prices_of_2h_periods()
+        self.sorted_prices_of_2h_periods = self.sort_prices_of_2h_periods()
+        self.best_n_periods_of_2h = self.get_best_n_periods_of_2h()
+
+    def get_best_n_periods_of_2h(self) -> List[Tuple[str, float]]:
+        return self.sorted_prices_of_2h_periods[0 : self.number_of_2h_periods]
+
+    def dict_to_list_of_tuples(self, data: dict) -> List[Tuple[str, float]]:
+        return [(k, v) for k, v in data.items()]
+
+    def sort_prices_of_2h_periods(self) -> List[Tuple[str, float]]:
+        prices = self.dict_to_list_of_tuples(self.prices_of_2h_periods)
+        prices.sort(key=lambda price: price[1])
+
+        return prices
 
     def get_6_cheapest_hours(self) -> dict:
         prices = {}
