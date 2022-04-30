@@ -26,3 +26,7 @@ jobs:
       - name: Run test suite
         run: |
           make test
+
+      - name: Send message to test channel
+        run: |
+          python main.py {{secrets.TELEGRAM_TOKEN}} @pvpc_report_test
