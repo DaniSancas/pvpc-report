@@ -46,10 +46,9 @@ class TestDomain:
         assert DeepDiff(expected_output, output) == {}
 
     def test_clean_pvpc_data(self, domain_with_raw: PVPCDay):
-        data_to_clean = domain_with_raw.raw_data
         expected_keys = [str(h).zfill(2) for h in range(24)]
 
-        output = domain_with_raw.clean_pvpc_data(raw_data=data_to_clean)
+        output = domain_with_raw.clean_pvpc_data()
 
         assert set(expected_keys) == set(output.keys())
 

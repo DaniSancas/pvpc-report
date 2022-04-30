@@ -12,17 +12,17 @@ class PVPCDay:
 
     def run(self):
         self.raw_data = self.input_repo.get_raw_data()
-        self.clean_data = self.clean_pvpc_data(self.raw_data)
+        self.clean_data = self.clean_pvpc_data()
 
     def clean_hourly_data(self, hour_data: dict) -> dict:
         cleaned_data = hour_data.copy()
         cleaned_data["hour"] = cleaned_data["hour"][0:2]
         return cleaned_data
 
-    def clean_pvpc_data(self, raw_data: dict) -> dict:
+    def clean_pvpc_data(self) -> dict:
         cleaned_data = {}
 
-        for hour_key, hour_value in raw_data.items():
+        for hour_key, hour_value in self.raw_data.items():
             cleaned_hour_key = hour_key[0:2]
             cleaned_hour_value = self.clean_hourly_data(hour_value)
 
