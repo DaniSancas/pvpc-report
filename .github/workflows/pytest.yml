@@ -29,4 +29,4 @@ jobs:
 
       - name: Send message to test channel
         run: |
-          pipenv run python main.py {{secrets.TELEGRAM_TOKEN}} @pvpc_report_test
+          pipenv run python main.py ${{secrets.TELEGRAM_TOKEN}} @pvpc_report_test
