@@ -2,6 +2,7 @@ from pvpc.port import InputPort, OutputPort
 
 import json
 
+import telegram
 import requests
 
 
@@ -19,3 +20,10 @@ class PrecioLuzInputAdapter(InputPort):
 class TelegramOutputAdapter(OutputPort):
     def post_processed_data(data: dict):
         pass
+
+    bot: telegram.Bot
+    channel: str
+
+    def __init__(self, token: str, channel: str) -> None:
+        self.channel = channel
+        self.bot = telegram.Bot(token=token)
