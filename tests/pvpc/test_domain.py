@@ -1,5 +1,4 @@
 import pytest
-import requests_mock
 from deepdiff import DeepDiff
 from pvpc.domain import PVPCDay
 from pvpc.port import InputPort, OutputPort
@@ -51,6 +50,46 @@ class TestDomain:
         output = domain_with_raw.clean_pvpc_data()
 
         assert set(expected_keys) == set(output.keys())
+
+    @pytest.mark.parametrize(
+        "hour, expected",
+        [
+            (0, "00-01"),
+            (1, "01-02"),
+            (22, "22-23"),
+            (23, "23-24"),
+        ],
+        ids=["0", "1", "22", "23"],
+    )
+    def test_get_hour_key_string_from_number(
+        self, hour: int, expected: str, domain_with_dummy: PVPCDay
+    ):
+        assert expected == domain_with_dummy.get_hour_key_string_from_number(hour)
+
+    @pytest.mark.parametrize(
+        "first_hour, second_hour, expected",
+        [
+            ("00-01", "01-02", "00-02"),
+            ("01-02", "02-03", "01-03"),
+            ("21-22", "22-23", "21-23"),
+            ("22-23", "23-24", "22-24"),
+        ],
+        ids=["00-02", "01-03", "21-23", "22-24"],
+    )
+    def test_compose_key_from_2h(
+        self, first_hour, second_hour, expected, domain_with_dummy: PVPCDay
+    ):
+        assert expected == domain_with_dummy.compose_key_from_2h(
+            first_hour, second_hour
+        )
+
+    def test_get_prices_of_2h_periods(
+        self, domain_with_raw: PVPCDay, prices_2h_periods_data: dict
+    ):
+        expected = prices_2h_periods_data
+        output = domain_with_raw.get_prices_of_2h_periods()
+
+        assert DeepDiff(expected, output) == {}
 
     def test_run(self, monkeypatch, domain_with_dummy: PVPCDay, raw_data: dict):
         def mock_raw_data():
