@@ -66,6 +66,20 @@ class TestDomain:
 
         assert DeepDiff(expected, output) == {}
 
+    def test_get_6_cheapest_hours(self, domain_with_raw: PVPCDay):
+        expected = {
+            "00-01": 254.96,
+            "01-02": 255.29,
+            "02-03": 256.76,
+            "03-04": 258.82,
+            "14-15": 253.06,
+            "15-16": 256.81,
+        }
+
+        output = domain_with_raw.get_6_cheapest_hours()
+
+        assert DeepDiff(expected, output) == {}
+
     def test_run(self, monkeypatch, domain_with_dummy: PVPCDay, raw_data: dict):
         def mock_raw_data():
             return raw_data
@@ -83,3 +97,7 @@ class TestDomain:
         assert len(pvpc.prices_of_2h_periods) == 23
         assert pvpc.prices_of_2h_periods["00-02"] == 255.12
         assert pvpc.prices_of_2h_periods["22-24"] == 310.88
+
+        assert len(pvpc.cheapest_6h) == 6
+        assert pvpc.cheapest_6h["00-01"] == 254.96
+        assert pvpc.cheapest_6h["15-16"] == 256.81
