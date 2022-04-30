@@ -68,6 +68,32 @@ class TestDomain:
 
         assert set(expected) == set(output)
 
+    def test_collect_processed_data(self, domain_with_raw: PVPCDay):
+        input_cheapest_6h = {
+            "00-01": 254.96,
+            "01-02": 255.29,
+            "02-03": 256.76,
+            "03-04": 258.82,
+            "14-15": 253.06,
+            "15-16": 256.81,
+        }
+        input_best_n_periods_of_2h = [
+            ("22-23", 240),
+            ("01-02", 250),
+        ]
+
+        expected = {
+            "cheapest_6h": input_cheapest_6h,
+            "best_n_periods_of_2h": input_best_n_periods_of_2h,
+        }
+
+        domain_with_raw.cheapest_6h = input_cheapest_6h
+        domain_with_raw.best_n_periods_of_2h = input_best_n_periods_of_2h
+
+        output = domain_with_raw.collect_processed_data()
+
+        assert DeepDiff(expected, output) == {}
+
     def test_get_best_n_periods_of_2h(self, domain_with_raw: PVPCDay):
         input = [
             ("22-23", 240),
@@ -161,3 +187,10 @@ class TestDomain:
         assert len(pvpc.best_n_periods_of_2h) == pvpc.number_of_2h_periods
         assert pvpc.best_n_periods_of_2h[0][0] == "14-16"
         assert pvpc.best_n_periods_of_2h[0][1] == 254.94
+
+        assert len(pvpc.processed_data) == 2
+        assert {"best_n_periods_of_2h", "cheapest_6h"} == pvpc.processed_data.keys()
+        assert pvpc.processed_data["best_n_periods_of_2h"][0][0] == "14-16"
+        assert pvpc.processed_data["best_n_periods_of_2h"][0][1] == 254.94
+        assert pvpc.processed_data["cheapest_6h"]["00-01"] == 254.96
+        assert pvpc.processed_data["cheapest_6h"]["15-16"] == 256.81

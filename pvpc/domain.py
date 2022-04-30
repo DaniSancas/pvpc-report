@@ -9,7 +9,8 @@ class PVPCDay:
     prices_of_2h_periods: dict
     sorted_prices_of_2h_periods: List[Tuple[str, float]]
     cheapest_6h: dict
-    best_n_periods_of_2h: dict
+    best_n_periods_of_2h: List[Tuple[str, float]]
+    processed_data: dict
 
     def __init__(
         self,
@@ -23,10 +24,20 @@ class PVPCDay:
 
     def run(self):
         self.raw_data = self.input_repo.get_raw_data()
+
         self.cheapest_6h = self.get_6_cheapest_hours()
         self.prices_of_2h_periods = self.get_prices_of_2h_periods()
         self.sorted_prices_of_2h_periods = self.sort_prices_of_2h_periods()
         self.best_n_periods_of_2h = self.get_best_n_periods_of_2h()
+        self.processed_data = self.collect_processed_data()
+
+        self.output_repo.post_processed_data(self.processed_data)
+
+    def collect_processed_data(self) -> dict:
+        return {
+            "cheapest_6h": self.cheapest_6h,
+            "best_n_periods_of_2h": self.best_n_periods_of_2h,
+        }
 
     def get_best_n_periods_of_2h(self) -> List[Tuple[str, float]]:
         return self.sorted_prices_of_2h_periods[0 : self.number_of_2h_periods]
