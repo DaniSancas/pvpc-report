@@ -26,31 +26,6 @@ class TestDomain:
         domain_with_dummy.raw_data = raw_data
         return domain_with_dummy
 
-    def test_clean_hourly_data(self, domain_with_raw: PVPCDay):
-        hour_to_test = domain_with_raw.raw_data["00-01"]
-
-        expected_output = {
-            "date": "29-04-2022",
-            "hour": "00",
-            "is-cheap": True,
-            "is-under-avg": True,
-            "market": "PVPC",
-            "price": 254.96,
-            "units": "€/Mwh",
-        }
-
-        output = domain_with_raw.clean_hourly_data(hour_data=hour_to_test)
-
-        assert expected_output["hour"] == output["hour"]
-        assert DeepDiff(expected_output, output) == {}
-
-    def test_clean_pvpc_data(self, domain_with_raw: PVPCDay):
-        expected_keys = [str(h).zfill(2) for h in range(24)]
-
-        output = domain_with_raw.clean_pvpc_data()
-
-        assert set(expected_keys) == set(output.keys())
-
     @pytest.mark.parametrize(
         "hour, expected",
         [
@@ -105,7 +80,6 @@ class TestDomain:
         assert pvpc.raw_data["00-01"]["price"] == 254.96
         assert pvpc.raw_data["00-01"]["hour"] == "00-01"
 
-        assert len(pvpc.clean_data) == 24
-        assert "price" in pvpc.clean_data["00"]
-        assert pvpc.clean_data["00"]["price"] == 254.96
-        assert pvpc.clean_data["00"]["hour"] == "00"
+        assert len(pvpc.prices_of_2h_periods) == 23
+        assert pvpc.prices_of_2h_periods["00-02"] == 255.12
+        assert pvpc.prices_of_2h_periods["22-24"] == 310.88
