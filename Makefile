@@ -1,8 +1,11 @@
-.PHONY: install test
+.PHONY: install install-dev test format precommit
 
 default: install
 
 install:
+	pipenv install
+
+install-dev:
 	pipenv install --dev
 
 test:
