@@ -2,7 +2,16 @@ import pytest
 from requests import HTTPError
 import requests_mock
 
-from pvpc.adapter import PrecioLuzInputAdapter
+from pvpc.adapter import PrecioLuzInputAdapter, TelegramOutputAdapter, telegram
+
+
+@pytest.fixture()
+def bot_with_dummy(monkeypatch) -> TelegramOutputAdapter:
+    def mock_bot(token: str):
+        return None
+
+    monkeypatch.setattr(telegram, "Bot", mock_bot)
+    return TelegramOutputAdapter(None, None)
 
 
 class TestAdapter:
@@ -24,3 +33,44 @@ class TestAdapter:
                 )
                 input_repo = PrecioLuzInputAdapter()
                 _ = input_repo.get_raw_data()
+
+    def test_list_of_tuples_to_str(self, bot_with_dummy: TelegramOutputAdapter):
+        input = {
+            "00-01": 254.96,
+            "01-02": 255.29,
+            "02-03": 256.76,
+            "03-04": 258.82,
+            "14-15": 253.06,
+            "15-16": 256.81,
+        }
+
+        expected = (
+            "00-01: 254.96 €/Mwh\n"
+            "01-02: 255.29 €/Mwh\n"
+            "02-03: 256.76 €/Mwh\n"
+            "03-04: 258.82 €/Mwh\n"
+            "14-15: 253.06 €/Mwh\n"
+            "15-16: 256.81 €/Mwh\n"
+        )
+        output = bot_with_dummy.dict_to_str(input)
+
+        assert expected == output
+
+    def test_list_of_tuples_to_str(self, bot_with_dummy: TelegramOutputAdapter):
+        input = [
+            ("22-23", 240),
+            ("01-02", 250),
+            ("00-01", 260),
+            ("23-24", 270),
+        ]
+
+        expected = (
+            "22-23: 240 €/Mwh\n"
+            "01-02: 250 €/Mwh\n"
+            "00-01: 260 €/Mwh\n"
+            "23-24: 270 €/Mwh\n"
+        )
+
+        output = bot_with_dummy.list_of_tuples_to_str(input)
+
+        assert expected == output
