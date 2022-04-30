@@ -1,23 +1,18 @@
-import json
-
-import requests
+from pvpc.port import InputPort, OutputPort
 
 
 class PVPCDay:
 
-    endpoint = "https://api.preciodelaluz.org/v1/prices/all?zone=PCB"
     raw_data: dict
     clean_data: dict
 
+    def __init__(self, input_repo: InputPort, output_repo: OutputPort) -> None:
+        self.input_repo = input_repo
+        self.output_repo = output_repo
+
     def run(self):
-        self.raw_data = self.get_today_raw_pvpc_data()
+        self.raw_data = self.input_repo.get_raw_data()
         self.clean_data = self.clean_pvpc_data(self.raw_data)
-
-    def get_today_raw_pvpc_data(self) -> dict:
-        response = requests.get(self.endpoint)
-        response.raise_for_status()
-
-        return json.loads(response.text)
 
     def clean_hourly_data(self, hour_data: dict) -> dict:
         cleaned_data = hour_data.copy()
