@@ -1,6 +1,8 @@
 # pvpc-report
 
 [![Test](https://github.com/DaniSancas/pvpc-report/actions/workflows/ci.yml/badge.svg)](https://github.com/DaniSancas/pvpc-report/actions/workflows/ci.yml)
+[![Daily post to channel](https://github.com/DaniSancas/pvpc-report/actions/workflows/daily_message.yml/badge.svg)](https://github.com/DaniSancas/pvpc-report/actions/workflows/daily_message.yml)
+
 
 ---
 
