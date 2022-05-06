@@ -1,5 +1,9 @@
 # pvpc-report
 
+[![Test](https://github.com/DaniSancas/pvpc-report/actions/workflows/ci.yml/badge.svg)](https://github.com/DaniSancas/pvpc-report/actions/workflows/ci.yml)
+
+---
+
 :es:
 
 App para consultar el precio de la luz PVPC en España desde el canal de Telegram [PVPC Report](https://t.me/pvpc_report).
