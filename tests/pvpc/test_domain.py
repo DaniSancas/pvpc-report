@@ -129,13 +129,35 @@ class TestDomain:
             ("01-02", 250),
         ]
 
+        input_am_cheapest_3h_period = ("00-03", 255.67)
+        input_pm_cheapest_3h_period = ("14-17", 259.52)
+
+        input_am_cheapest_3h_period_unfolded = [
+            ("00-01", 254.96),
+            ("01-02", 255.29),
+            ("02-03", 256.76),
+        ]
+        input_pm_cheapest_3h_period_unfolded = [
+            ("14-15", 253.06),
+            ("15-16", 256.81),
+            ("16-17", 268.7),
+        ]
+
         expected = {
             "cheapest_6h": input_cheapest_6h,
             "best_n_periods_of_2h": input_best_n_periods_of_2h,
+            "am_cheapest_3h_period": input_am_cheapest_3h_period,
+            "pm_cheapest_3h_period": input_pm_cheapest_3h_period,
+            "am_cheapest_3h_period_unfolded": input_am_cheapest_3h_period_unfolded,
+            "pm_cheapest_3h_period_unfolded": input_pm_cheapest_3h_period_unfolded,
         }
 
         domain_with_raw.cheapest_6h = input_cheapest_6h
         domain_with_raw.best_n_periods_of_2h = input_best_n_periods_of_2h
+        domain_with_raw.am_cheapest_3h_period = input_am_cheapest_3h_period
+        domain_with_raw.pm_cheapest_3h_period = input_pm_cheapest_3h_period
+        domain_with_raw.am_cheapest_3h_period_unfolded = input_am_cheapest_3h_period_unfolded
+        domain_with_raw.pm_cheapest_3h_period_unfolded = input_pm_cheapest_3h_period_unfolded
 
         output = domain_with_raw.collect_processed_data()
 
@@ -368,6 +390,14 @@ class TestDomain:
 
         pvpc = domain_with_dummy
         monkeypatch.setattr(pvpc.input_repo, "get_raw_data", mock_raw_data)
+        processed_data_keys = {
+            "best_n_periods_of_2h", 
+            "cheapest_6h",
+            "am_cheapest_3h_period",
+            "pm_cheapest_3h_period",
+            "am_cheapest_3h_period_unfolded",
+            "pm_cheapest_3h_period_unfolded",
+        }
 
         pvpc.run()
 
@@ -394,8 +424,8 @@ class TestDomain:
         assert pvpc.best_n_periods_of_2h[0][0] == "14-16"
         assert pvpc.best_n_periods_of_2h[0][1] == 254.94
 
-        assert len(pvpc.processed_data) == 2
-        assert {"best_n_periods_of_2h", "cheapest_6h"} == pvpc.processed_data.keys()
+        assert len(pvpc.processed_data) == 6
+        assert processed_data_keys == pvpc.processed_data.keys()
         assert pvpc.processed_data["best_n_periods_of_2h"][0][0] == "14-16"
         assert pvpc.processed_data["best_n_periods_of_2h"][0][1] == 254.94
         assert pvpc.processed_data["cheapest_6h"]["00-01"] == 254.96

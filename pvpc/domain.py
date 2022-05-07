@@ -36,10 +36,12 @@ class PVPCDay:
         self.raw_data = self.input_repo.get_raw_data()
 
         self.cheapest_6h = self.get_6_cheapest_hours()
+
         self.prices_of_2h_periods = self.get_prices_of_2h_periods()
         self.sorted_prices_of_2h_periods = self.sort_prices_of_2h_periods()
         self.best_n_periods_of_2h = self.get_best_n_periods_of_2h()
         self.am_prices, self.pm_prices = self.split_am_and_pm()
+
         self.am_3h_periods = self.get_prices_for_3h_periods(is_am=True)
         self.pm_3h_periods = self.get_prices_for_3h_periods(is_am=False)
         self.sorted_am_3h_periods = self.sort_prices(is_am=True)
@@ -48,6 +50,7 @@ class PVPCDay:
         self.pm_cheapest_3h_period = self.get_best_period(is_am=False)
         self.am_cheapest_3h_period_unfolded = self.get_best_period_unfolded(is_am=True)
         self.pm_cheapest_3h_period_unfolded = self.get_best_period_unfolded(is_am=False)
+
         self.processed_data = self.collect_processed_data()
 
         self.output_repo.post_processed_data(self.processed_data)
@@ -56,6 +59,10 @@ class PVPCDay:
         return {
             "cheapest_6h": self.cheapest_6h,
             "best_n_periods_of_2h": self.best_n_periods_of_2h,
+            "am_cheapest_3h_period": self.am_cheapest_3h_period,
+            "pm_cheapest_3h_period": self.pm_cheapest_3h_period,
+            "am_cheapest_3h_period_unfolded": self.am_cheapest_3h_period_unfolded,
+            "pm_cheapest_3h_period_unfolded": self.pm_cheapest_3h_period_unfolded,
         }
 
     def get_best_period_unfolded(self, is_am: bool) -> List[Tuple[str, float]]:
