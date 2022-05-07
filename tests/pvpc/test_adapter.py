@@ -34,6 +34,22 @@ class TestAdapter:
                 input_repo = PrecioLuzInputAdapter()
                 _ = input_repo.get_raw_data()
 
+    def test_tuple_to_str(self, bot_with_dummy: TelegramOutputAdapter):
+        input_data = ("00-01", 254.96)
+
+        expected = "00-01: 254.96 €/mWh\n"
+        output = bot_with_dummy.tuple_to_str(input_data)
+
+        assert expected == output
+
+    def test_key_value_pair_to_str(self, bot_with_dummy: TelegramOutputAdapter):
+        input_key, input_value = ("00-01", 254.96)
+
+        expected = "00-01: 254.96 €/mWh\n"
+        output = bot_with_dummy.key_value_pair_to_str(input_key, input_value)
+
+        assert expected == output
+
     def test_list_of_tuples_to_str(self, bot_with_dummy: TelegramOutputAdapter):
         input = {
             "00-01": 254.96,
@@ -45,12 +61,12 @@ class TestAdapter:
         }
 
         expected = (
-            "00-01: 254.96 €/Mwh\n"
-            "01-02: 255.29 €/Mwh\n"
-            "02-03: 256.76 €/Mwh\n"
-            "03-04: 258.82 €/Mwh\n"
-            "14-15: 253.06 €/Mwh\n"
-            "15-16: 256.81 €/Mwh\n"
+            "00-01: 254.96 €/mWh\n"
+            "01-02: 255.29 €/mWh\n"
+            "02-03: 256.76 €/mWh\n"
+            "03-04: 258.82 €/mWh\n"
+            "14-15: 253.06 €/mWh\n"
+            "15-16: 256.81 €/mWh\n"
         )
         output = bot_with_dummy.dict_to_str(input)
 
@@ -65,10 +81,10 @@ class TestAdapter:
         ]
 
         expected = (
-            "22-23: 240 €/Mwh\n"
-            "01-02: 250 €/Mwh\n"
-            "00-01: 260 €/Mwh\n"
-            "23-24: 270 €/Mwh\n"
+            "22-23: 240 €/mWh\n"
+            "01-02: 250 €/mWh\n"
+            "00-01: 260 €/mWh\n"
+            "23-24: 270 €/mWh\n"
         )
 
         output = bot_with_dummy.list_of_tuples_to_str(input)

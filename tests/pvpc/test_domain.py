@@ -1,3 +1,4 @@
+from typing import Tuple
 import pytest
 from deepdiff import DeepDiff
 from pvpc.domain import PVPCDay
@@ -56,6 +57,27 @@ class TestDomain:
     ):
         assert expected == domain_with_raw.compose_key_from_2h(first_hour, second_hour)
 
+    @pytest.mark.parametrize(
+        "composed_key, expected_first_hour, expected_second_hour",
+        [
+            ("02-03", "02", "03"),
+            ("00-02", "00", "02"),
+            ("01-04", "01", "04"),
+        ],
+        ids=["1h", "2h", "3h"],
+    )
+    def test_decompose_key_from_2h(
+        self,
+        composed_key: str,
+        expected_first_hour: str,
+        expected_second_hour: str,
+        domain_with_raw: PVPCDay,
+    ):
+        assert (
+            expected_first_hour,
+            expected_second_hour,
+        ) == domain_with_raw.decompose_key_from_2h(composed_key)
+
     def test_dict_to_list_of_tuples(self, domain_with_raw: PVPCDay):
         input = {
             "key": "value",
@@ -77,70 +99,201 @@ class TestDomain:
             "14-15": 253.06,
             "15-16": 256.81,
         }
-        input_best_n_periods_of_2h = [
-            ("22-23", 240),
-            ("01-02", 250),
+
+        input_am_cheapest_3h_period = ("00-03", 255.67)
+        input_pm_cheapest_3h_period = ("14-17", 259.52)
+
+        input_am_cheapest_3h_period_unfolded = [
+            ("00-01", 254.96),
+            ("01-02", 255.29),
+            ("02-03", 256.76),
+        ]
+        input_pm_cheapest_3h_period_unfolded = [
+            ("14-15", 253.06),
+            ("15-16", 256.81),
+            ("16-17", 268.7),
         ]
 
         expected = {
             "cheapest_6h": input_cheapest_6h,
-            "best_n_periods_of_2h": input_best_n_periods_of_2h,
+            "am_cheapest_3h_period": input_am_cheapest_3h_period,
+            "pm_cheapest_3h_period": input_pm_cheapest_3h_period,
+            "am_cheapest_3h_period_unfolded": input_am_cheapest_3h_period_unfolded,
+            "pm_cheapest_3h_period_unfolded": input_pm_cheapest_3h_period_unfolded,
         }
 
         domain_with_raw.cheapest_6h = input_cheapest_6h
-        domain_with_raw.best_n_periods_of_2h = input_best_n_periods_of_2h
+        domain_with_raw.am_cheapest_3h_period = input_am_cheapest_3h_period
+        domain_with_raw.pm_cheapest_3h_period = input_pm_cheapest_3h_period
+        domain_with_raw.am_cheapest_3h_period_unfolded = (
+            input_am_cheapest_3h_period_unfolded
+        )
+        domain_with_raw.pm_cheapest_3h_period_unfolded = (
+            input_pm_cheapest_3h_period_unfolded
+        )
 
         output = domain_with_raw.collect_processed_data()
 
         assert DeepDiff(expected, output) == {}
 
-    def test_get_best_n_periods_of_2h(self, domain_with_raw: PVPCDay):
-        input = [
-            ("22-23", 240),
-            ("01-02", 250),
-            ("00-01", 260),
-            ("23-24", 270),
-        ]
-
-        expected = [
-            ("22-23", 240),
-            ("01-02", 250),
-        ]
-
-        domain_with_raw.number_of_2h_periods = 2
-        domain_with_raw.sorted_prices_of_2h_periods = input
-        output = domain_with_raw.get_best_n_periods_of_2h()
-
-        assert set(expected) == set(output)
-
-    def test_sort_prices_of_2h_periods(self, domain_with_raw: PVPCDay):
-        input = {
-            "00-01": 260,
-            "01-02": 250,
-            "22-23": 240,
-            "23-24": 270,
-        }
-
-        expected = [
-            ("22-23", 240),
-            ("01-02", 250),
-            ("00-01", 260),
-            ("23-24", 270),
-        ]
-
-        domain_with_raw.prices_of_2h_periods = input
-
-        output = domain_with_raw.sort_prices_of_2h_periods()
-
-        assert set(expected) == set(output)
-
-    def test_get_prices_of_2h_periods(
-        self, domain_with_raw: PVPCDay, prices_2h_periods_data: dict
+    @pytest.mark.parametrize(
+        "is_am",
+        [True, False],
+        ids=["am", "pm"],
+    )
+    def test_get_prices_for_3h_periods(
+        self,
+        is_am: bool,
+        domain_with_raw: PVPCDay,
+        am_prices_3h_periods_data: dict,
+        pm_prices_3h_periods_data: dict,
     ):
-        expected = prices_2h_periods_data
-        output = domain_with_raw.get_prices_of_2h_periods()
+        expected = am_prices_3h_periods_data if is_am else pm_prices_3h_periods_data
+        output = domain_with_raw.get_prices_for_3h_periods(is_am=is_am)
 
         assert DeepDiff(expected, output) == {}
+
+    @pytest.mark.parametrize(
+        "is_am, input_data, expected",
+        [
+            (
+                True,
+                {
+                    "00-03": 260.1,
+                    "01-04": 250.2,
+                    "02-05": 240.3,
+                    "03-06": 270.4,
+                },
+                [
+                    ("02-05", 240.3),
+                    ("01-04", 250.2),
+                    ("00-03", 260.1),
+                    ("03-06", 270.4),
+                ],
+            ),
+            (
+                False,
+                {
+                    "12-15": 260.1,
+                    "13-16": 250.2,
+                    "14-17": 240.3,
+                    "15-18": 270.4,
+                },
+                [
+                    ("14-17", 240.3),
+                    ("13-16", 250.2),
+                    ("12-15", 260.1),
+                    ("15-18", 270.4),
+                ],
+            ),
+        ],
+        ids=["am", "pm"],
+    )
+    def test_sort_prices(
+        self, is_am: bool, input_data: dict, expected: list, domain_with_dummy: PVPCDay
+    ):
+        if is_am:
+            domain_with_dummy.am_3h_periods = input_data
+        else:
+            domain_with_dummy.pm_3h_periods = input_data
+
+        output = domain_with_dummy.sort_prices(is_am=is_am)
+
+        assert set(expected) == set(output)
+
+    @pytest.mark.parametrize(
+        "is_am, input_data, expected",
+        [
+            (
+                True,
+                [
+                    ("02-05", 240.3),
+                    ("01-04", 250.2),
+                    ("00-03", 260.1),
+                    ("03-06", 270.4),
+                ],
+                ("02-05", 240.3),
+            ),
+            (
+                False,
+                [
+                    ("14-17", 240.3),
+                    ("13-16", 250.2),
+                    ("12-15", 260.1),
+                    ("15-18", 270.4),
+                ],
+                ("14-17", 240.3),
+            ),
+        ],
+        ids=["am", "pm"],
+    )
+    def test_get_best_period(
+        self,
+        is_am: bool,
+        input_data: list,
+        expected: Tuple[str, float],
+        domain_with_dummy: PVPCDay,
+    ):
+        pvpc = domain_with_dummy
+        if is_am:
+            pvpc.sorted_am_3h_periods = input_data
+        else:
+            pvpc.sorted_pm_3h_periods = input_data
+
+        output = pvpc.get_best_period(is_am=is_am)
+
+        assert set(expected) == set(output)
+
+    @pytest.mark.parametrize(
+        "is_am, input_data, expected",
+        [
+            (
+                True,
+                [
+                    ("00-03", 255.67),
+                    ("01-04", 256.96),
+                    ("02-05", 258.97),
+                    ("03-06", 263.57),
+                ],
+                [
+                    ("00-01", 254.96),
+                    ("01-02", 255.29),
+                    ("02-03", 256.76),
+                ],
+            ),
+            (
+                False,
+                [
+                    ("14-17", 259.52),
+                    ("13-16", 271.0),
+                    ("12-15", 288.16),
+                    ("15-18", 267.81),
+                ],
+                [
+                    ("14-15", 253.06),
+                    ("15-16", 256.81),
+                    ("16-17", 268.7),
+                ],
+            ),
+        ],
+        ids=["am", "pm"],
+    )
+    def test_get_best_period_unfolded(
+        self,
+        is_am: bool,
+        input_data: list,
+        expected: list,
+        domain_with_raw: PVPCDay,
+    ):
+        pvpc = domain_with_raw
+        if is_am:
+            pvpc.sorted_am_3h_periods = input_data
+        else:
+            pvpc.sorted_pm_3h_periods = input_data
+
+        output = pvpc.get_best_period_unfolded(is_am=is_am)
+
+        assert set(expected) == set(output)
 
     def test_get_6_cheapest_hours(self, domain_with_raw: PVPCDay):
         expected = {
@@ -162,6 +315,13 @@ class TestDomain:
 
         pvpc = domain_with_dummy
         monkeypatch.setattr(pvpc.input_repo, "get_raw_data", mock_raw_data)
+        processed_data_keys = {
+            "cheapest_6h",
+            "am_cheapest_3h_period",
+            "pm_cheapest_3h_period",
+            "am_cheapest_3h_period_unfolded",
+            "pm_cheapest_3h_period_unfolded",
+        }
 
         pvpc.run()
 
@@ -174,23 +334,21 @@ class TestDomain:
         assert pvpc.cheapest_6h["00-01"] == 254.96
         assert pvpc.cheapest_6h["15-16"] == 256.81
 
-        assert len(pvpc.prices_of_2h_periods) == 23
-        assert pvpc.prices_of_2h_periods["00-02"] == 255.12
-        assert pvpc.prices_of_2h_periods["22-24"] == 310.88
+        assert pvpc.am_cheapest_3h_period == ("00-03", 255.67)
+        assert pvpc.pm_cheapest_3h_period == ("14-17", 259.52)
 
-        assert len(pvpc.sorted_prices_of_2h_periods) == 23
-        assert pvpc.sorted_prices_of_2h_periods[0][0] == "14-16"
-        assert pvpc.sorted_prices_of_2h_periods[0][1] == 254.94
-        assert pvpc.sorted_prices_of_2h_periods[-1][0] == "20-22"
-        assert pvpc.sorted_prices_of_2h_periods[-1][1] == 381.50
+        assert pvpc.am_cheapest_3h_period_unfolded == [
+            ("00-01", 254.96),
+            ("01-02", 255.29),
+            ("02-03", 256.76),
+        ]
+        assert pvpc.pm_cheapest_3h_period_unfolded == [
+            ("14-15", 253.06),
+            ("15-16", 256.81),
+            ("16-17", 268.7),
+        ]
 
-        assert len(pvpc.best_n_periods_of_2h) == pvpc.number_of_2h_periods
-        assert pvpc.best_n_periods_of_2h[0][0] == "14-16"
-        assert pvpc.best_n_periods_of_2h[0][1] == 254.94
-
-        assert len(pvpc.processed_data) == 2
-        assert {"best_n_periods_of_2h", "cheapest_6h"} == pvpc.processed_data.keys()
-        assert pvpc.processed_data["best_n_periods_of_2h"][0][0] == "14-16"
-        assert pvpc.processed_data["best_n_periods_of_2h"][0][1] == 254.94
+        assert len(pvpc.processed_data) == 5
+        assert processed_data_keys == pvpc.processed_data.keys()
         assert pvpc.processed_data["cheapest_6h"]["00-01"] == 254.96
         assert pvpc.processed_data["cheapest_6h"]["15-16"] == 256.81
