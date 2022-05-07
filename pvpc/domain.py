@@ -6,6 +6,8 @@ class PVPCDay:
 
     number_of_2h_periods: int
     raw_data: dict
+    am_prices: dict
+    pm_prices: dict
     prices_of_2h_periods: dict
     sorted_prices_of_2h_periods: List[Tuple[str, float]]
     cheapest_6h: dict
@@ -29,6 +31,7 @@ class PVPCDay:
         self.prices_of_2h_periods = self.get_prices_of_2h_periods()
         self.sorted_prices_of_2h_periods = self.sort_prices_of_2h_periods()
         self.best_n_periods_of_2h = self.get_best_n_periods_of_2h()
+        self.am_prices, self.pm_prices = self.split_am_and_pm()
         self.processed_data = self.collect_processed_data()
 
         self.output_repo.post_processed_data(self.processed_data)
@@ -38,6 +41,18 @@ class PVPCDay:
             "cheapest_6h": self.cheapest_6h,
             "best_n_periods_of_2h": self.best_n_periods_of_2h,
         }
+    
+    def split_am_and_pm(self) -> Tuple[dict, dict]:
+        am_dict = {}
+        pm_dict = {}
+        
+        for k, v in self.raw_data.items():
+            if int(k[:2]) < 12:
+                am_dict.update({k: v})
+            else:
+                pm_dict.update({k: v})
+        
+        return am_dict, pm_dict
 
     def get_best_n_periods_of_2h(self) -> List[Tuple[str, float]]:
         return self.sorted_prices_of_2h_periods[0 : self.number_of_2h_periods]

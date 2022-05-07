@@ -41,6 +41,47 @@ class TestDomain:
     ):
         assert expected == domain_with_dummy.get_hour_key_string_from_number(hour)
 
+    def test_split_am_and_pm(self, domain_with_dummy: PVPCDay):
+        def mock_raw_data():
+            return {**expected_am, **expected_pm}
+        
+        expected_am = {
+            "00-01": {
+                "price": 0.1
+            },
+            "01-02": {
+                "price": 1.2
+            },
+            "10-11": {
+                "price": 10.11
+            },
+            "11-12": {
+                "price": 11.12
+            }
+        }
+        expected_pm = {
+            "12-13": {
+                "price": 12.13
+            },
+            "13-14": {
+                "price": 12.13
+            },
+            "22-23": {
+                "price": 22.23
+            },
+            "23-24": {
+                "price": 23.24
+            },
+        }
+
+        pvpc = domain_with_dummy
+        pvpc.raw_data = mock_raw_data()
+
+        output_am, output_pm = pvpc.split_am_and_pm()
+
+        assert DeepDiff(expected_am, output_am) == {}
+        assert DeepDiff(expected_pm, output_pm) == {}
+
     @pytest.mark.parametrize(
         "first_hour, second_hour, expected",
         [
