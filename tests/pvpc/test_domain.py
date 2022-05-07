@@ -156,8 +156,12 @@ class TestDomain:
         domain_with_raw.best_n_periods_of_2h = input_best_n_periods_of_2h
         domain_with_raw.am_cheapest_3h_period = input_am_cheapest_3h_period
         domain_with_raw.pm_cheapest_3h_period = input_pm_cheapest_3h_period
-        domain_with_raw.am_cheapest_3h_period_unfolded = input_am_cheapest_3h_period_unfolded
-        domain_with_raw.pm_cheapest_3h_period_unfolded = input_pm_cheapest_3h_period_unfolded
+        domain_with_raw.am_cheapest_3h_period_unfolded = (
+            input_am_cheapest_3h_period_unfolded
+        )
+        domain_with_raw.pm_cheapest_3h_period_unfolded = (
+            input_pm_cheapest_3h_period_unfolded
+        )
 
         output = domain_with_raw.collect_processed_data()
 
@@ -391,7 +395,7 @@ class TestDomain:
         pvpc = domain_with_dummy
         monkeypatch.setattr(pvpc.input_repo, "get_raw_data", mock_raw_data)
         processed_data_keys = {
-            "best_n_periods_of_2h", 
+            "best_n_periods_of_2h",
             "cheapest_6h",
             "am_cheapest_3h_period",
             "pm_cheapest_3h_period",

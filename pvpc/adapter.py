@@ -26,20 +26,41 @@ class TelegramOutputAdapter(OutputPort):
     def __init__(self, token: str, channel: str) -> None:
         self.channel = channel
         self.bot = telegram.Bot(token=token)
+    
+    def tuple_to_str(self, tuple:Tuple[str, float]) -> str:
+        return self.key_value_pair_to_str(tuple[0], tuple[1])
+
+    def key_value_pair_to_str(self, k: str, v: float) -> str:
+        return f"{k}: {str(v)} €/mWh\n"
 
     def list_of_tuples_to_str(self, data: List[Tuple[str, float]]) -> str:
-        return "".join([f"{k}: {str(v)} €/Mwh\n" for k, v in data])
+        return "".join([self.key_value_pair_to_str(k, v) for k, v in data])
 
     def dict_to_str(self, data: dict) -> str:
-        return "".join([f"{k}: {str(v)} €/Mwh\n" for k, v in data.items()])
+        return "".join([self.key_value_pair_to_str(k, v) for k, v in data.items()])
 
     def generate_message(self, data: dict) -> str:
-        message = "Precios de la luz para hoy\n"
+        message = "Precios de la luz para hoy:\n"
+
         message += "\n*Las horas más baratas:*\n"
         message += self.dict_to_str(data["cheapest_6h"])
-        message += "\n*Los rangos de 2h más baratos*\n"
-        message += "_(precio medio de ambas horas)_:\n"
-        message += self.list_of_tuples_to_str(data["best_n_periods_of_2h"])
+
+        # message += "\n*Los rangos de 2h más baratos*\n"
+        # message += "_(precio medio de ambas horas)_:\n"
+        # message += self.list_of_tuples_to_str(data["best_n_periods_of_2h"])
+
+        message += "\n*Periodos de 3h más baratos:*\n"
+
+        message += f"\n*AM:* _(precio medio)_\n"
+        message += self.tuple_to_str(data['am_cheapest_3h_period'])
+        message += f"_(desglose)_\n"
+        message += self.list_of_tuples_to_str(data["am_cheapest_3h_period_unfolded"])
+
+        message += f"\n*PM:* _(precio medio)_\n"
+        message += self.tuple_to_str(data['pm_cheapest_3h_period'])
+        message += f"_(desglose)_\n"
+        message += self.list_of_tuples_to_str(data["pm_cheapest_3h_period_unfolded"])
+
         return message
 
     def post_processed_data(self, data: dict):
