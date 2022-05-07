@@ -1,3 +1,4 @@
+from typing import Tuple
 import pytest
 from deepdiff import DeepDiff
 from pvpc.domain import PVPCDay
@@ -80,6 +81,27 @@ class TestDomain:
         self, first_hour, second_hour, expected, domain_with_raw: PVPCDay
     ):
         assert expected == domain_with_raw.compose_key_from_2h(first_hour, second_hour)
+
+    @pytest.mark.parametrize(
+        "composed_key, expected_first_hour, expected_second_hour",
+        [
+            ("02-03", "02", "03"),
+            ("00-02", "00", "02"),
+            ("01-04", "01", "04"),
+        ],
+        ids=["1h", "2h", "3h"],
+    )
+    def test_decompose_key_from_2h(
+        self,
+        composed_key: str,
+        expected_first_hour: str,
+        expected_second_hour: str,
+        domain_with_raw: PVPCDay,
+    ):
+        assert (
+            expected_first_hour,
+            expected_second_hour,
+        ) == domain_with_raw.decompose_key_from_2h(composed_key)
 
     def test_dict_to_list_of_tuples(self, domain_with_raw: PVPCDay):
         input = {
@@ -215,13 +237,106 @@ class TestDomain:
     def test_sort_prices(
         self, is_am: bool, input_data: dict, expected: list, domain_with_dummy: PVPCDay
     ):
-
         if is_am:
             domain_with_dummy.am_3h_periods = input_data
         else:
             domain_with_dummy.pm_3h_periods = input_data
 
         output = domain_with_dummy.sort_prices(is_am=is_am)
+
+        assert set(expected) == set(output)
+
+    @pytest.mark.parametrize(
+        "is_am, input_data, expected",
+        [
+            (
+                True,
+                [
+                    ("02-05", 240.3),
+                    ("01-04", 250.2),
+                    ("00-03", 260.1),
+                    ("03-06", 270.4),
+                ],
+                ("02-05", 240.3),
+            ),
+            (
+                False,
+                [
+                    ("14-17", 240.3),
+                    ("13-16", 250.2),
+                    ("12-15", 260.1),
+                    ("15-18", 270.4),
+                ],
+                ("14-17", 240.3),
+            ),
+        ],
+        ids=["am", "pm"],
+    )
+    def test_get_best_period(
+        self,
+        is_am: bool,
+        input_data: list,
+        expected: Tuple[str, float],
+        domain_with_dummy: PVPCDay,
+    ):
+        pvpc = domain_with_dummy
+        if is_am:
+            pvpc.sorted_am_3h_periods = input_data
+        else:
+            pvpc.sorted_pm_3h_periods = input_data
+
+        output = pvpc.get_best_period(is_am=is_am)
+
+        assert set(expected) == set(output)
+
+    @pytest.mark.parametrize(
+        "is_am, input_data, expected",
+        [
+            (
+                True,
+                [
+                    ("02-05", 258.97),
+                    ("01-04", 256.96),
+                    ("00-03", 255.67),
+                    ("03-06", 263.57),
+                ],
+                [
+                    ("02-03", 256.76),
+                    ("03-04", 258.82),
+                    ("04-05", 261.32),
+                ],
+            ),
+            (
+                False,
+                [
+                    ("14-17", 259.52),
+                    ("13-16", 271.0),
+                    ("12-15", 288.16),
+                    ("15-18", 267.81),
+                ],
+                [
+                    ("14-15", 253.06),
+                    ("15-16", 256.81),
+                    ("16-17", 268.7),
+                ],
+            ),
+        ],
+        ids=["am", "pm"],
+    )
+    def test_get_best_period_unfolded(
+        self,
+        is_am: bool,
+        input_data: list,
+        expected: list,
+        domain_with_raw: PVPCDay,
+    ):
+        pvpc = domain_with_raw
+        if is_am:
+            pvpc.sorted_am_3h_periods = input_data
+        else:
+            pvpc.sorted_pm_3h_periods = input_data
+
+        output = pvpc.get_best_period_unfolded(is_am=is_am)
 
         assert set(expected) == set(output)
 

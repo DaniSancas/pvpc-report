@@ -16,6 +16,10 @@ class PVPCDay:
     pm_3h_periods: dict
     sorted_am_3h_periods: List[Tuple[str, float]]
     sorted_pm_3h_periods: List[Tuple[str, float]]
+    am_cheapest_3h_period: Tuple[str, float]
+    pm_cheapest_3h_period: Tuple[str, float]
+    am_cheapest_3h_period_unfolded: List[Tuple[str, float]]
+    pm_cheapest_3h_period_unfolded: List[Tuple[str, float]]
     processed_data: dict
 
     def __init__(
@@ -40,6 +44,10 @@ class PVPCDay:
         self.pm_3h_periods = self.get_prices_for_3h_periods(is_am=False)
         self.sorted_am_3h_periods = self.sort_prices(is_am=True)
         self.sorted_pm_3h_periods = self.sort_prices(is_am=False)
+        self.am_cheapest_3h_period = self.get_best_period(is_am=True)
+        self.pm_cheapest_3h_period = self.get_best_period(is_am=False)
+        self.am_cheapest_3h_period_unfolded = self.get_best_period_unfolded(is_am=True)
+        self.pm_cheapest_3h_period_unfolded = self.get_best_period_unfolded(is_am=False)
         self.processed_data = self.collect_processed_data()
 
         self.output_repo.post_processed_data(self.processed_data)
@@ -49,7 +57,25 @@ class PVPCDay:
             "cheapest_6h": self.cheapest_6h,
             "best_n_periods_of_2h": self.best_n_periods_of_2h,
         }
-    
+
+    def get_best_period_unfolded(self, is_am: bool) -> List[Tuple[str, float]]:
+        prices = []
+        sorted_period_am_or_pm = self.get_best_period(is_am=is_am)
+        start_hour, stop_hour = self.decompose_key_from_2h(sorted_period_am_or_pm[0])
+
+        for hour in range(int(start_hour), int(stop_hour)):
+            formatted_hour = self.get_hour_key_string_from_number(hour)
+            price = self.raw_data[formatted_hour]["price"]
+            prices.append((formatted_hour, price))
+
+        return prices
+
+    def get_best_period(self, is_am: bool) -> Tuple[str, float]:
+        sorted_period_am_or_pm = (
+            self.sorted_am_3h_periods if is_am else self.sorted_pm_3h_periods
+        )
+        return sorted_period_am_or_pm[0]
+
     def get_prices_for_3h_periods(self, is_am: bool) -> dict:
         prices = {}
         hour_range = range(10) if is_am else range(12, 22)
@@ -127,6 +153,9 @@ class PVPCDay:
 
     def compose_key_from_2h(self, first_hour: str, second_hour: str) -> str:
         return f"{first_hour[0:3]}{second_hour[3:5]}"
+
+    def decompose_key_from_2h(self, composed_key: str) -> str:
+        return composed_key[0:2], composed_key[3:5]
 
     def get_hour_key_string_from_number(self, hour: int) -> str:
         return f"{str(hour).zfill(2)}-{str(hour+1).zfill(2)}"
