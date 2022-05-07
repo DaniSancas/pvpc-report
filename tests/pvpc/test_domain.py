@@ -44,34 +44,18 @@ class TestDomain:
     def test_split_am_and_pm(self, domain_with_dummy: PVPCDay):
         def mock_raw_data():
             return {**expected_am, **expected_pm}
-        
+
         expected_am = {
-            "00-01": {
-                "price": 0.1
-            },
-            "01-02": {
-                "price": 1.2
-            },
-            "10-11": {
-                "price": 10.11
-            },
-            "11-12": {
-                "price": 11.12
-            }
+            "00-01": {"price": 0.1},
+            "01-02": {"price": 1.2},
+            "10-11": {"price": 10.11},
+            "11-12": {"price": 11.12},
         }
         expected_pm = {
-            "12-13": {
-                "price": 12.13
-            },
-            "13-14": {
-                "price": 12.13
-            },
-            "22-23": {
-                "price": 22.23
-            },
-            "23-24": {
-                "price": 23.24
-            },
+            "12-13": {"price": 12.13},
+            "13-14": {"price": 12.13},
+            "22-23": {"price": 22.23},
+            "23-24": {"price": 23.24},
         }
 
         pvpc = domain_with_dummy
@@ -172,6 +156,72 @@ class TestDomain:
         domain_with_raw.prices_of_2h_periods = input
 
         output = domain_with_raw.sort_prices_of_2h_periods()
+
+        assert set(expected) == set(output)
+
+    @pytest.mark.parametrize(
+        "is_am",
+        [True, False],
+        ids=["am", "pm"],
+    )
+    def test_get_prices_for_3h_periods(
+        self,
+        is_am: bool,
+        domain_with_raw: PVPCDay,
+        am_prices_3h_periods_data: dict,
+        pm_prices_3h_periods_data: dict,
+    ):
+        expected = am_prices_3h_periods_data if is_am else pm_prices_3h_periods_data
+        output = domain_with_raw.get_prices_for_3h_periods(is_am=is_am)
+
+        assert DeepDiff(expected, output) == {}
+
+    @pytest.mark.parametrize(
+        "is_am, input_data, expected",
+        [
+            (
+                True,
+                {
+                    "00-03": 260.1,
+                    "01-04": 250.2,
+                    "02-05": 240.3,
+                    "03-06": 270.4,
+                },
+                [
+                    ("02-05", 240.3),
+                    ("01-04", 250.2),
+                    ("00-03", 260.1),
+                    ("03-06", 270.4),
+                ],
+            ),
+            (
+                False,
+                {
+                    "12-15": 260.1,
+                    "13-16": 250.2,
+                    "14-17": 240.3,
+                    "15-18": 270.4,
+                },
+                [
+                    ("14-17", 240.3),
+                    ("13-16", 250.2),
+                    ("12-15", 260.1),
+                    ("15-18", 270.4),
+                ],
+            ),
+        ],
+        ids=["am", "pm"],
+    )
+    def test_sort_prices(
+        self, is_am: bool, input_data: dict, expected: list, domain_with_dummy: PVPCDay
+    ):
+
+        if is_am:
+            domain_with_dummy.am_3h_periods = input_data
+        else:
+            domain_with_dummy.pm_3h_periods = input_data
+
+        output = domain_with_dummy.sort_prices(is_am=is_am)
 
         assert set(expected) == set(output)
 
