@@ -26,8 +26,8 @@ class TelegramOutputAdapter(OutputPort):
     def __init__(self, token: str, channel: str) -> None:
         self.channel = channel
         self.bot = telegram.Bot(token=token)
-    
-    def tuple_to_str(self, tuple:Tuple[str, float]) -> str:
+
+    def tuple_to_str(self, tuple: Tuple[str, float]) -> str:
         return self.key_value_pair_to_str(tuple[0], tuple[1])
 
     def key_value_pair_to_str(self, k: str, v: float) -> str:
@@ -49,16 +49,16 @@ class TelegramOutputAdapter(OutputPort):
         # message += "_(precio medio de ambas horas)_:\n"
         # message += self.list_of_tuples_to_str(data["best_n_periods_of_2h"])
 
-        message += "\n*Periodos de 3h más baratos:*\n"
+        message += "\n\n*Periodos de 3h más baratos:*\n"
 
-        message += f"\n*AM:* _(precio medio)_\n"
-        message += self.tuple_to_str(data['am_cheapest_3h_period'])
-        message += f"_(desglose)_\n"
+        message += "\n*AM* -> Periodo (3h) más barato:\n"
+        message += self.tuple_to_str(data["am_cheapest_3h_period"])
+        message += "\nDetalle por hora:\n"
         message += self.list_of_tuples_to_str(data["am_cheapest_3h_period_unfolded"])
 
-        message += f"\n*PM:* _(precio medio)_\n"
-        message += self.tuple_to_str(data['pm_cheapest_3h_period'])
-        message += f"_(desglose)_\n"
+        message += "\n*PM* -> Periodo (3h) más barato:\n"
+        message += self.tuple_to_str(data["pm_cheapest_3h_period"])
+        message += "\nDetalle por hora:\n"
         message += self.list_of_tuples_to_str(data["pm_cheapest_3h_period_unfolded"])
 
         return message
