@@ -45,11 +45,7 @@ class TelegramOutputAdapter(OutputPort):
         message += "\n*Las horas más baratas:*\n"
         message += self.dict_to_str(data["cheapest_6h"])
 
-        # message += "\n*Los rangos de 2h más baratos*\n"
-        # message += "_(precio medio de ambas horas)_:\n"
-        # message += self.list_of_tuples_to_str(data["best_n_periods_of_2h"])
-
-        message += "\n\n*Periodos de 3h más baratos:*\n"
+        message += "\n\n*Periodos AM/PM más baratos:*\n"
 
         message += "\n*AM* -> Periodo (3h) más barato:\n"
         message += self.tuple_to_str(data["am_cheapest_3h_period"])
